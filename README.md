@@ -8,17 +8,20 @@ If you have an operating MySQL database server (MySQL, Percona, MariaDB) the cod
 
 To make some reporting more complete, the database should include more complete demographic information than what the FCC database includes. I found a freely available database with city, state, zip, lat/long, county, country, timezone, and population details. Running a query with inner join on zip code (which is included on most FCC records) will allow the other metadata to be included.
 
-### fcculszip-mysql-importer
-bootstrap zipcode table using initialize/ULSDATA_zipcodes.sql
-
-
-## Amateur Tower tables
-
-### fcculstower-mysql-importer
-bootstrap tower tables using initialize/ULSDATA_tower_SCHEMA.sql
+import the zipcode table using initialize/ULSDATA_zipcodes.sql
 
 
 ## Amateur Operator tables
 
-### fcculsamat-mysql-importer
+The full details of the FCC ULS database for Amateur Operator information.
+
+#### Amateur Operator table structure
 bootstrap amateur operator tables using initialize/ULSDATA_amat_SCHEMA.sql
+
+
+## Amateur Tower tables
+
+The full details of the FCC ULS database for Tower information
+
+#### Tower table structure
+bootstrap tower tables using initialize/ULSDATA_tower_SCHEMA.sql
