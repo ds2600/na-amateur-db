@@ -11,45 +11,49 @@
 # user=mysql_user
 # password="mysql_password"
 #
-
+user={{ DB_USER }}
+host={{ DB_HOST }}
+db=ULSDATA #Database name
+password={{ DB_PASSWORD }}
+basedir={{ DIR }}/ULSDATA/amat
 
 #### Get new FCC data
 
 echo ""
 echo "getting new data from FCC ULS"
 echo ""
-wget http://wireless.fcc.gov/uls/data/complete/l_amat.zip
+#wget https://data.fcc.gov/download/pub/uls/complete/l_amat.zip
 echo ""
 echo "expanding data"
 echo ""
-unzip l_amat.zip
+#unzip l_amat.zip
 
 #### Clean up old data from Database
 
-echo ""
-echo "clearing old data out of database"
-mysql -e 'truncate table PUBACC_AM' ULSDATA
-echo "PUBACC_AM truncated"
-mysql -e 'truncate table PUBACC_CO' ULSDATA
-echo "PUBACC_CO truncated"
-mysql -e 'truncate table PUBACC_EN' ULSDATA
-echo "PUBACC_EN truncated"
-mysql -e 'truncate table PUBACC_HD' ULSDATA
-echo "PUBACC_HD truncated"
-mysql -e 'truncate table PUBACC_HS' ULSDATA
-echo "PUBACC_HS truncated"
-mysql -e 'truncate table PUBACC_LA' ULSDATA
-echo "PUBACC_LA truncated"
-mysql -e 'truncate table PUBACC_SC' ULSDATA
-echo "PUBACC_SC truncated"
-mysql -e 'truncate table PUBACC_SF' ULSDATA
-echo "PUBACC_SF truncated"
+# echo ""
+# echo "clearing old data out of database"
+# mysql -e 'truncate table PUBACC_AM' ULSDATA
+# echo "PUBACC_AM truncated"
+# mysql -e 'truncate table PUBACC_CO' ULSDATA
+# echo "PUBACC_CO truncated"
+# mysql -e 'truncate table PUBACC_EN' ULSDATA
+# echo "PUBACC_EN truncated"
+# mysql -e 'truncate table PUBACC_HD' ULSDATA
+# echo "PUBACC_HD truncated"
+# mysql -e 'truncate table PUBACC_HS' ULSDATA
+# echo "PUBACC_HS truncated"
+# mysql -e 'truncate table PUBACC_LA' ULSDATA
+# echo "PUBACC_LA truncated"
+# mysql -e 'truncate table PUBACC_SC' ULSDATA
+# echo "PUBACC_SC truncated"
+# mysql -e 'truncate table PUBACC_SF' ULSDATA
+# echo "PUBACC_SF truncated"
 
 #### import the new data
 
 echo ""
 echo "importing new data"
-mysql ULSDATA < loadULSDATA.sql
+mysql -h $host -u $user -p$password ULSDATA < loadULSDATA.sql
 echo "... done"
 
 #### Remove old FCC data files.
