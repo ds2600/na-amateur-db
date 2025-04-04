@@ -30,3 +30,6 @@ The full details of the FCC ULS database for Tower information
 
 #### Tower table structure
 bootstrap tower tables using initialize/ULSDATA_tower_SCHEMA.sql
+
+
+Create a database, and then create the tables, then run "onetime" in AM. 

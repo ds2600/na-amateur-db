@@ -16,7 +16,7 @@ user="{{ DB_USER }}"
 host="{{ DB_HOST }}"
 db="ULSDATA"
 password="{{ DB_PASSWORD }}"
-basedir="{{ DIR }}/FCCULS-mysql/amat"
+basedir="$(pwd)"
 
 yesterday=`date -d "1 day ago" +%a`
 day=${yesterday,,}
@@ -39,77 +39,29 @@ echo ""
 echo "importing new data"
 echo ""
 
-file="AM.dat"
-if [ -f "$file" ]
-then
-	mysql -h $host -u $user -p$password ULSDATA < {{ DIR }}/FCCULS-mysql/amat/update_AM.sql
-	echo "$file imported"
-else
-	echo "$file does not exist in this batch"
-fi
-
-file="CO.dat"
-if [ -f "$file" ]
-then
-        mysql -h $host -u $user -p$password ULSDATA < {{ DIR }}/FCCULS-mysql/amat/update_CO.sql
+run_sql() {
+    local dat_file="$1"
+    local sql_file="$2"
+    file="$basedir/$dat_file"
+    if [ -f "$file" ]
+    then
+        sed "s|{{ DIR }}/FCCULS-mysql/amat|$basedir|g" "$sql_file" | mysql --local-infile "$db"
         echo "$file imported"
-else
+    else
         echo "$file does not exist in this batch"
-fi
+    fi
+}
 
-file="EN.dat"
-if [ -f "$file" ]
-then
-        mysql -h $host -u $user -p$password ULSDATA < {{ DIR }}/FCCULS-mysql/amat/update_EN.sql
-        echo "$file imported"
-else
-        echo "$file does not exist in this batch"
-fi
+    run_sql "AM.dat" "update_AM.sql"
+    run_sql "CO.dat" "update_CO.sql"
+    run_sql "EN.dat" "update_EN.sql"
+    run_sql "HD.dat" "update_HD.sql"
+    run_sql "HS.dat" "update_HS.sql"
+    run_sql "LA.dat" "update_LA.sql"
+    run_sql "SC.dat" "update_SC.sql"
+    run_sql "SF.dat" "update_SF.sql"
 
-file="HD.dat"
-if [ -f "$file" ]
-then
-        mysql -h $host -u $user -p$password ULSDATA < {{ DIR }}/FCCULS-mysql/amat/update_HD.sql
-        echo "$file imported"
-else
-        echo "$file does not exist in this batch"
-fi
 
-file="HS.dat"
-if [ -f "$file" ]
-then
-        mysql -h $host -u $user -p$password ULSDATA < {{ DIR }}/FCCULS-mysql/amat/update_HS.sql
-        echo "$file imported"
-else
-        echo "$file does not exist in this batch"
-fi
-
-file="LA.dat"
-if [ -f "$file" ]
-then
-        mysql -h $host -u $user -p$password ULSDATA < {{ DIR }}/FCCULS-mysql/amat/update_LA.sql
-        echo "$file imported"
-else
-        echo "$file does not exist in this batch"
-fi
-
-file="SC.dat"
-if [ -f "$file" ]
-then
-        mysql -h $host -u $user -p$password ULSDATA < {{ DIR }}/FCCULS-mysql/amat/update_SC.sql
-        echo "$file imported"
-else
-        echo "$file does not exist in this batch"
-fi
-
-file="SF.dat"
-if [ -f "$file" ]
-then
-        mysql -h $host -u $user -p$password ULSDATA < {{ DIR }}/FCCULS-mysql/amat/update_SF.sql
-        echo "$file imported"
-else
-        echo "$file does not exist in this batch"
-fi
 
 echo ""
 echo "done importing this batch"

@@ -17,7 +17,8 @@
 
 echo "getting new data from FCC ULS"
 echo ""
-wget http://wireless.fcc.gov/uls/data/complete/r_tower.zip
+#wget http://wireless.fcc.gov/uls/data/complete/r_tower.zip
+wget https://data.fcc.gov/download/pub/uls/complete/r_tower.zip
 
 echo ""
 echo "expanding data"
