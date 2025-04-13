@@ -26,7 +26,7 @@ day=${yesterday,,}
 echo ""
 echo "Getting yesterday's data from FCC ULS"
 echo ""
-wget -U "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0" https://data.fcc.gov/download/pub/uls/daily/l_am_$day.zip
+curl -O https://data.fcc.gov/download/pub/uls/daily/l_am_$day.zip
 
 echo ""
 echo "expanding data"
