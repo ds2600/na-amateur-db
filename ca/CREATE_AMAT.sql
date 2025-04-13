@@ -1,0 +1,23 @@
+CREATE TABLE `CANADA_LIC` (
+  `unique_system_identifier` INT NOT NULL AUTO_INCREMENT,
+  `callsign` char(10) NOT NULL ,
+  `first_name` varchar(20) DEFAULT NULL ,
+  `surname` varchar(20) DEFAULT NULL ,
+  `street_address` varchar(60) DEFAULT NULL ,
+  `city` varchar(20) DEFAULT NULL ,
+  `province` char(2) DEFAULT NULL ,
+  `postal_code` char(7) DEFAULT NULL ,
+  `qual_a` char(1) DEFAULT NULL ,
+  `qual_b` char(1) DEFAULT NULL ,
+  `qual_c` char(1) DEFAULT NULL ,
+  `qual_d` char(1) DEFAULT NULL ,
+  `qual_e` char(1) DEFAULT NULL ,
+  `club_name` varchar(50) DEFAULT NULL ,
+  `club_name_2` varchar(50) DEFAULT NULL ,
+  `club_address` varchar(60) DEFAULT NULL ,
+  `club_city` varchar(20) DEFAULT NULL ,
+  `club_province` char(2) DEFAULT NULL ,
+  `club_postal_code` char(7) DEFAULT NULL ,
+  PRIMARY KEY (`unique_system_identifier`),
+  INDEX `callsign` (`callsign`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Canadian amateur radio licensee data';

@@ -2,3 +2,13 @@ amat/*.zip
 amat/*.dat
 tower/*.zip
 tower/*.dat
+
+ca/*.zip
+ca/*.txt
+ca/*.sha256
+us/*.zip
+us/*.dat
+
+*.log
+*.zip
+.env

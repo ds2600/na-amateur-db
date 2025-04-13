@@ -22,11 +22,11 @@ basedir={{ DIR }}/ULSDATA/amat
 echo ""
 echo "getting new data from FCC ULS"
 echo ""
-#wget https://data.fcc.gov/download/pub/uls/complete/l_amat.zip
+curl -O https://data.fcc.gov/download/pub/uls/complete/l_amat.zip
 echo ""
 echo "expanding data"
 echo ""
-#unzip l_amat.zip
+unzip l_amat.zip
 
 #### Clean up old data from Database
 
