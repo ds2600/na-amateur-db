@@ -39,6 +39,6 @@ chmod +x initialize.sh us/firstRun.sh us/run.sh ca/run.sh
 ./initialize.sh
 
 # Add the following to your crontab
-0 0 * * 0 /path/to/na-amateur-db/us/run.sh
-0 0 * * 0 /path/to/na-amateur-db/ca/run.sh
+0 12 * * * /path/to/na-amateur-db/us/run.sh
+0 12 * * * /path/to/na-amateur-db/ca/run.sh
 ```
