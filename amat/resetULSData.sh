@@ -54,7 +54,7 @@ unzip l_amat.zip
 echo ""
 echo "importing new data"
 #mysql -h $host -u $user -p$password ULSDATA < loadULSDATA.sql
-mysql --local-infile ULSDATA < loadULSDATA.sql
+mysql -h $host -u $user -p$password $dbname --local-infile ULSDATA < loadULSDATA.sql
 echo "... done"
 
 #### Remove old FCC data files.

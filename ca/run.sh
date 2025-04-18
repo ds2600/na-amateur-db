@@ -70,16 +70,23 @@ ZIPFILE='amateur_delim.zip'
 ZIPURL='https://apc-cap.ic.gc.ca/datafiles/amateur_delim.zip'
 
 echo "Downloading Canadian data..."
-curl -s -o "$ZIPFILE" "$ZIPURL" || { echo "Error: Failed to download zip file"; exit 1; }
+curl --progress-bar -s -o "$ZIPFILE" "$ZIPURL" || { echo "Error: Failed to download zip file"; exit 1; }
+
+yesterday=`date -d "1 day ago" +%a`
+day=${yesterday,,}
+
 
 if verify_zip_checksum "$ZIPFILE"; then
     echo "Data unchanged. Skipping import."
+    echo "$(date),$day,skipping" >> latestRuns.txt
     rm -f "$ZIPFILE"
     exit 0
 fi
+echo "$(date),$day,running" >> latestRuns.txt
 
 echo "Data changed. Proceeding with import."
 store_zip_checksum "$ZIPFILE"
+
 
 echo "Unzipping data..."
 unzip -o "$ZIPFILE" -d amateur_delim || { echo "Error: Failed to unzip file"; exit 1; }
@@ -101,6 +108,8 @@ fi
 
 # SQL to load data (embedded)
 SQL_SCRIPT=$(cat << EOF
+
+TRUNCATE TABLE CANADA_LIC;
 -- Create temporary table for loading
 CREATE TEMPORARY TABLE temp_canada_lic (
   callsign char(10),

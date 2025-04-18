@@ -3,8 +3,8 @@
 set -e
 
 # Load .env file
-if [ -f "../.env" ]; then
-    export $(grep -v '^#' ../.env | xargs)
+if [ -f ".env" ]; then
+    export $(grep -v '^#' .env | xargs)
 else
     echo "Error: .env file not found"
     exit 1
@@ -17,6 +17,16 @@ DB_HOST="$DB_HOST"
 
 if ([ -z "$DB_USER" ] || [ -z "$DB_PASS" ] || [ -z "$DB_NAME" ] || [ -z "$DB_HOST" ]); then
     echo "Error: Database credentials are not set in the .env file"
+    exit 1
+fi
+
+# Check and create the database if it doesn't exist
+echo "Checking if database '$DB_NAME' exists..."
+mysql -u "$DB_USER" -p"$DB_PASS" -h "$DB_HOST" -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;"
+if [ $? -eq 0 ]; then
+    echo "Database '$DB_NAME' is ready."
+else
+    echo "Failed to create or access database '$DB_NAME'"
     exit 1
 fi
 
@@ -48,3 +58,14 @@ for sql_file in "${sql_files[@]}"; do
 done
 
 echo "All SQL files executed successfully."
+
+echo "Running first US import.."
+cd us && ./firstRun.sh
+
+echo "Running first CA import.."
+cd ../ca && ./run.sh
+
+cd ..
+echo "All imports completed successfully."
+
+echo "Initialization completed."

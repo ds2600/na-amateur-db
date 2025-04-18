@@ -21,23 +21,63 @@ basedir="$(pwd)"
 yesterday=`date -d "1 day ago" +%a`
 day=${yesterday,,}
 
+generate_zip_checksum() {
+    local zipfile="$1"
+    sha256sum "$zipfile" | awk '{print $1}'
+}
+
+store_zip_checksum() {
+    local zipfile="$1"
+    local outfile="${zipfile}.sha256"
+
+    generate_zip_checksum "$zipfile" > "$outfile"
+    echo "Stored checksum in $outfile"
+}
+
+verify_zip_checksum() {
+    local zipfile="$1"
+    local outfile="${zipfile}.sha256"
+
+    if [[ ! -f "$outfile" ]]; then
+        echo "No stored checksum file found: $outfile" >&2
+        false
+        return
+    fi
+
+    local current
+    current=$(generate_zip_checksum "$zipfile")
+    local stored
+    stored=$(<"$outfile")
+
+    if [[ "$current" == "$stored" ]]; then
+        true
+    else
+        false
+    fi
+}
+
+
 #### Get new FCC data
 
-echo ""
 echo "Getting yesterday's data from FCC ULS"
-echo ""
-curl -O https://data.fcc.gov/download/pub/uls/daily/l_am_$day.zip
+ZIPFILE="l_am_$day.zip"
+curl -O https://data.fcc.gov/download/pub/uls/daily/$ZIPFILE
 
-echo ""
+if verify_zip_checksum "$ZIPFILE"; then
+    echo "Data unchanged. Skipping import."
+    echo "$(date),$day,skipping" >> latestRuns.txt
+    rm -f "$ZIPFILE"
+    exit 0
+fi
+echo "$(date),$day,running" >> latestRuns.txt
+
+echo "Data changed. Proceeding with import."
+store_zip_checksum "$ZIPFILE"
+
 echo "expanding data"
-echo ""
-unzip l_am_$day.zip
+unzip -o $ZIPFILE
 
-#### import the new data
-
-echo ""
 echo "importing new data"
-echo ""
 
 run_sql() {
     local dat_file="$1"
@@ -63,14 +103,10 @@ run_sql() {
 
 
 
-echo ""
 echo "done importing this batch"
 
 #### Remove old FCC data files.
 
-echo ""
 echo "cleaning up"
-echo ""
 rm -f l_am_$day.zip *.dat counts
 echo "files removed"
-echo ""

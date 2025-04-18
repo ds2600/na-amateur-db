@@ -8,6 +8,8 @@ ca/*.txt
 ca/*.sha256
 us/*.zip
 us/*.dat
+us/*.txt
+us/*.sha256
 
 *.log
 *.zip
