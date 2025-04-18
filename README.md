@@ -20,4 +20,25 @@ import the zipcode table using initialize/ULSDATA_zipcodes.sql
 
 ## How to use it
 
-**Coming Soon**
+```bash
+
+# Install dependencies
+sudo apt update
+sudo apt install mysql-client curl unzip
+
+# Clone the repo
+git clone https://github.com/ds2600/na-amateur-db.git && cd na-amateur-db
+
+# Create the .env file with your database parameters. You don't need to have a database created yet.
+cp .env.example .env
+
+# Make the shell scripts executable
+chmod +x initialize.sh us/firstRun.sh us/run.sh ca/run.sh
+
+# Run intialization script - this should be run on a Sunday after the FCC updates their data
+./initialize.sh
+
+# Add the following to your crontab
+0 0 * * 0 /path/to/na-amateur-db/us/run.sh
+0 0 * * 0 /path/to/na-amateur-db/ca/run.sh
+```
