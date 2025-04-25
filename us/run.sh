@@ -12,11 +12,26 @@
 # password="mysql_password"
 #
 
+UPDATE=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --update)
+            UPDATE=true
+            shift
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 user="{{ DB_USER }}"
 host="{{ DB_HOST }}"
 db="ULSDATA"
 password="{{ DB_PASSWORD }}"
-basedir="$(pwd)"
+basedir="$(dirname "$(realpath "$0")")"
+cd "$basedir" || exit 1
 
 yesterday=`date -d "1 day ago" +%a`
 day=${yesterday,,}
@@ -56,29 +71,6 @@ verify_zip_checksum() {
     fi
 }
 
-
-#### Get new FCC data
-
-echo "Getting yesterday's data from FCC ULS"
-ZIPFILE="l_am_$day.zip"
-curl -O https://data.fcc.gov/download/pub/uls/daily/$ZIPFILE
-
-if verify_zip_checksum "$ZIPFILE"; then
-    echo "Data unchanged. Skipping import."
-    echo "$(date),$day,skipping" >> latestRuns.txt
-    rm -f "$ZIPFILE"
-    exit 0
-fi
-echo "$(date),$day,running" >> latestRuns.txt
-
-echo "Data changed. Proceeding with import."
-store_zip_checksum "$ZIPFILE"
-
-echo "expanding data"
-unzip -o $ZIPFILE
-
-echo "importing new data"
-
 run_sql() {
     local dat_file="$1"
     local sql_file="$2"
@@ -92,6 +84,26 @@ run_sql() {
     fi
 }
 
+process_day() {
+    local day="$1"
+    echo "Processing day: $day"
+    ZIPFILE="l_am_$day.zip"
+    ZIPPATH="$basedir/$ZIPFILE"
+    curl -O https://data.fcc.gov/download/pub/uls/daily/$ZIPFILE
+
+    if verify_zip_checksum "$ZIPPATH"; then
+        echo "Data unchanged. Skipping import."
+        echo "$(date),$day,skipping" >> "$basedir/latestRuns.txt"
+        rm -f "$ZIPPATH"
+        exit 0
+    fi
+    echo "$(date),$day,running" >> "$basedir/latestRuns.txt"
+    echo "Data changed. Proceeding with import."
+    store_zip_checksum "$ZIPFILE"
+    echo "expanding data"
+    unzip -o $ZIPPATH
+    echo "importing new data"
+
     run_sql "AM.dat" "update_AM.sql"
     run_sql "CO.dat" "update_CO.sql"
     run_sql "EN.dat" "update_EN.sql"
@@ -101,12 +113,23 @@ run_sql() {
     run_sql "SC.dat" "update_SC.sql"
     run_sql "SF.dat" "update_SF.sql"
 
+    echo "done importing $day batch"
+    echo "cleaning up"
+    rm -f $ZIPPATH *.dat counts
+    echo "files removed"
 
+}
 
-echo "done importing this batch"
+if $UPDATE; then
+    yesterday=$(date -d "1 day ago" +%Y-%m-%d)
+    latest_sunday=$(date -d "last Sunday" +%Y-%m-%d)
+    current_date=$latest_sunday
+    while [[ "$current_date" < "$yesterday" ]]; do
+        current_date=$(date -d "$current_date + 1 day" +%Y-%m-%d)
+        day=$(date -d "$current_date" +%a | tr '[:upper:]' '[:lower:]')
+        process_day "$day"
+    done
+else
+    process_day "$day"
+fi
 
-#### Remove old FCC data files.
-
-echo "cleaning up"
-rm -f l_am_$day.zip *.dat counts
-echo "files removed"

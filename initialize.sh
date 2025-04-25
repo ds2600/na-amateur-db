@@ -61,6 +61,7 @@ echo "All SQL files executed successfully."
 
 echo "Running first US import.."
 cd us && ./firstRun.sh
+./run.sh --update
 
 echo "Running first CA import.."
 cd ../ca && ./run.sh

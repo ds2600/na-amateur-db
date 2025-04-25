@@ -51,6 +51,13 @@ verify_zip_checksum() {
     fi
 }
 
+DATA_FILE="amateur_delim/amateur_delim.txt"
+DB_USER="$DB_USER"
+DB_PASS="$DB_PASS"
+DB_NAME="$DB_NAME"
+DB_HOST="$DB_HOST"
+BASEDIR="$(dirname "$(realpath "$0")")"
+
 echo "Checking for CANADA_LIC table..."
 TABLE_CHECK=$(mysql -u"$DB_USER" -p"$DB_PASS" -h"$DB_HOST" "$DB_NAME" -e "SHOW TABLES LIKE 'CANADA_LIC';" | grep CANADA_LIC | wc -l)
 if [ "$TABLE_CHECK" -eq 0 ]; then
@@ -67,6 +74,7 @@ else
 fi
 
 ZIPFILE='amateur_delim.zip'
+ZIPPATH="$BASEDIR/$ZIPFILE"
 ZIPURL='https://apc-cap.ic.gc.ca/datafiles/amateur_delim.zip'
 
 echo "Downloading Canadian data..."
@@ -76,10 +84,10 @@ yesterday=`date -d "1 day ago" +%a`
 day=${yesterday,,}
 
 
-if verify_zip_checksum "$ZIPFILE"; then
+if verify_zip_checksum "$ZIPPATH"; then
     echo "Data unchanged. Skipping import."
     echo "$(date),$day,skipping" >> latestRuns.txt
-    rm -f "$ZIPFILE"
+    rm -f "$ZIPPATH"
     exit 0
 fi
 echo "$(date),$day,running" >> latestRuns.txt
@@ -89,15 +97,9 @@ store_zip_checksum "$ZIPFILE"
 
 
 echo "Unzipping data..."
-unzip -o "$ZIPFILE" -d amateur_delim || { echo "Error: Failed to unzip file"; exit 1; }
+unzip -o "$ZIPPATH" -d amateur_delim || { echo "Error: Failed to unzip file"; exit 1; }
 
 # Configuration
-DATA_FILE="amateur_delim/amateur_delim.txt"
-DB_USER="$DB_USER"
-DB_PASS="$DB_PASS"
-DB_NAME="$DB_NAME"
-DB_HOST="$DB_HOST"
-BASEDIR="$(pwd)"
 
 # Verify data file exists
 FILE="$BASEDIR/$DATA_FILE"
